@@ -1,9 +1,11 @@
 # ESPHome-Analog-Clock
 This is an ESPHome component forked from the excellent source found here: https://github.com/markusressel/ESPHome-Analog-Clock
 
+⚠️ This is a work in progress - the idf_clock.h files and esphome_rmt_led_clock_effect.yaml light changes are complete, so you can use them as a custom_component, but this repository is not yet ready for use as an external_component
+
 # Significant changes
-* [x] Updated to work with external_components (custom_components are deprecated and will be removed in 2026.6.0)
-* [x] Updated to work with ESP-IDF (the ESPHome default for ESP32 / ESPC3|S2|S3
+* [ ] TODO: Update to work with external_components (custom_components are deprecated and will be removed in 2026.6.0)
+* [x] Updated to work with ESP-IDF (from 2026.1.0 the ESPHome default for ESP32 / ESPC3|S2|S3)
 * [x] Works with esp32_rmt_led_strip
 
 
