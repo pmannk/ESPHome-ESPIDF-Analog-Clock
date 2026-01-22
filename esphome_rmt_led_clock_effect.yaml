@@ -1,16 +1,18 @@
 substitutions:
   num_leds: "60"
 
-esp8266:
-  board: nodemcuv2
+external_components:
+  - source:
+      type: git
+      url: https://github.com/pmannk/ESPHome-ESPIDF-Analog-Clock
+
+esp32:
+  board: 'esp32-c3-devkitm-1'
   framework:
-    version: recommended
-  restore_from_flash: true
+    type: esp-idf 
 
 esphome:
-  name: nodemcu_uhr
-  includes:
-    - "clock.h"
+  name: esp32_clock
   on_boot:
     # set "loading" effect while initializing
     priority: 500.0
@@ -20,25 +22,6 @@ esphome:
           id: light_ring
           brightness: 100%
           effect: Sync
-
-wifi:
-  fast_connect: True  # only needed for hidden SSID
-  networks:
-    - ssid: !secret wifi_iot_ssid
-      bssid: !secret wifi_iot_bssid
-      password: !secret wifi_iot_password
-      hidden: true
-
-  # Enable fallback hotspot (captive portal) in case wifi connection fails
-  ap:
-    ssid: "Clock FB AP"
-    password: !secret clock_fallback_ap_password
-
-captive_portal:
-
-ota:
-  platform: esphome
-  password: !secret clock_ota_password
 
 globals:
   - id: clock_brightness
@@ -62,9 +45,9 @@ globals:
     initial_value: 'false'
 
 time:
-  - platform: sntp
-    id: sntp_time
-    timezone: Europe/Berlin
+  - platform: homeassistant
+    id: clock_time
+    timezone: Australia/Sydney
     on_time_sync:
       then:
         - light.turn_on:
@@ -114,22 +97,19 @@ switch:
         value: 'false'
 
 light:
-  - id: light_ring
-    internal: False
-    platform: neopixelbus
-    type: GRB
-    variant: SK6812 # WS2812X
-    pin: RX #GPIO23
+  - platform: esp32_rmt_led_strip
+    name: "Addressable Clock"
+    id: light_ring
+    pin: GPIO0 #Define your GPIO pin connected to the LED strip
+    chipset: WS2812 #Define your LED type
+    rgb_order: GRB #Adjust RGB order as required
     num_leds: "${num_leds}"
-    method: ESP8266_DMA
-    name: "NeoPixel Light"
-    color_correct: [50%, 50%, 50%]
     effects:
       - addressable_lambda:
           name: "Clock"
           update_interval: 32ms
           lambda: |-
-            auto time = id(sntp_time).now();
+            auto time = id(clock_time).now();
             int offset = 0;
             static Color clock_ring_colors [${num_leds}];
             update_clock_hands(it, time, clock_ring_colors, offset);
