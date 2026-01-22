@@ -1,7 +1,7 @@
 
 void update_clock_hands(AddressableLight &it, ESPTime time,
                         Color clock_ring_colors[], int offset) {
-  static boolean initialized;
+  static bool initialized = false;
   int num_leds = it.size();
 
   if (initialized == false) {
